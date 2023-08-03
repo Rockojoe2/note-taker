@@ -1,20 +1,21 @@
+//Imports
+
 const path = require("path");
 const express = require("express");
 const notes = require("./db/db.json")
-// const { title, text, id } = require("./db/db.json");
 const app = express();
 const fs = require('fs');
-// const uuid = require('./helpers/uuid');
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid'); //Need uuid for specific id for deletion purposes.
 const PORT = process.env.PORT || 3001;
 
 
-
+//Middleware needed
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
 
+//Paths
 app.get('/api/notes' , (req, res)=>{
     res.json(notes.slice());
 });
@@ -32,6 +33,7 @@ app.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
+//Function to write the notes and save them. User saves the notes, and it will write it in the db.json file.
 function updateNotesArray(newNote) {
     notes.push(newNote);
   
@@ -45,6 +47,7 @@ function updateNotesArray(newNote) {
     );
   }
 
+//Gets the previous notes that were already written out.
 app.post('/api/notes', (req, res) => {
 
     // const userNote = req.body;
@@ -76,11 +79,11 @@ app.post('/api/notes', (req, res) => {
 app.delete('/api/notes/:id', (req, res) => {
     const noteIdToDelete = req.params.id;
   
-    // Find the index of the note with the given id in the notes array
+    // Find the index of the note with the given id that we used UUID for in the notes array
     const noteIndex = notes.findIndex((note) => note.id === noteIdToDelete);
   
     if (noteIndex === -1) {
-      // If the note with the given id is not found, return 404 Not Found
+      // Error handling. If the note with the given id is not found, return 404 Not Found
       return res.status(404).json({ error: 'Note not found' });
     }
   
